@@ -15,6 +15,10 @@ public class CACoinWeights implements  CoinWeights {
 			return new MeasuredCoin(5);
 		}
 
+		if (unknownCoin.getWeight()== 1.75d && unknownCoin.getDiameter()== 18.03d) {
+			return new MeasuredCoin(10);
+		}
+
 		return NOT_RECOGNIZED;
 	}
 }

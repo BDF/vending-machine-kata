@@ -33,4 +33,13 @@ public class CACoinWeightsTest {
 		assertEquals(CoinWeights.NOT_RECOGNIZED, value);
 	}
 
+	@Test
+	public void shouldBeValid2000CADime() {
+		double weight = 1.75d;
+		double diameter = 18.03d;
+		UnknownCoin uc = new UnknownCoin(weight, diameter);
+		MeasuredCoin value = coinWeights.measureCoin(uc);
+		assertEquals("Should have a value of 10", 10, value.getValue());
+	}
+
 }

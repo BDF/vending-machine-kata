@@ -28,14 +28,14 @@ public class VendingMachine {
 		int total = coinsAccumulated.total();
 		VendingMachineStatus newMachineStatus;
 		CoinsAccumulated newCoinsAccumulated;
-		Product product = vendingMachineStatus.getProductSelected();
+		Product product = vendingMachineStatus.getVendingButton().getAssociatedProduct();
 
 		if ("THANK YOU".equals(vendingMachineStatus.getMachineDisplay().getDisplay())) {
 			newMachineStatus = new VendingMachineStatus();
 		} else if (Product.NO_PRODUCT_SELECTED.equals(product)) {
 			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(vendingMachineStatus.getCoinsAccumulated().total());
 			MachineDisplay machineDisplay = new MachineDisplay(coinDisplay.getDisplay());
-			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
+			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getVendingButton());
 		} else  if (total >= product.getCost()) {
 			MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
 			int changeReturned = total - product.getCost();
@@ -44,7 +44,7 @@ public class VendingMachine {
 		} else if (total > 0) {
 			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(product.getCost());
 			MachineDisplay machineDisplay = new MachineDisplay("PRICE " + coinDisplay.getDisplay());
-			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
+			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getVendingButton());
 		} else {
 			MachineDisplay machineDisplay  = vendingMachineStatus.getMachineDisplay();
 			newCoinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
@@ -56,11 +56,38 @@ public class VendingMachine {
 
 	public VendingMachineStatus addCoin(VendingMachineStatus vendingMachineStatus, MeasuredCoin coin) {
 		CoinsAccumulated allCoins = vendingMachineStatus.getCoinsAccumulated().addCoin(coin);
-		return new VendingMachineStatus(allCoins, vendingMachineStatus.getMachineDisplay(), vendingMachineStatus.getProductSelected());
+		return new VendingMachineStatus(allCoins, vendingMachineStatus.getMachineDisplay(), vendingMachineStatus.getVendingButton());
 	}
 
 	public CoinDisplay getCoinDisplay(VendingMachineStatus vendingMachineStatus) {
 		CoinDisplay coinDisplay = coinWeights.getCoinDisplay(vendingMachineStatus.getCoinsAccumulated().total());
 		return coinDisplay;
+	}
+
+	private VendingMachineStatus returnCoins(VendingMachineStatus vendingMachineStatus) {
+		CoinsAccumulated coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
+		CoinsAccumulated coinsReturned = coinsAccumulated;
+		return new VendingMachineStatus(new CoinsAccumulated(), new MachineDisplay("INSERT COIN"), coinsReturned);
+	}
+
+
+	public VendingMachineStatus selectButton(VendingMachineStatus vendingMachineStatus) {
+		VendingAction vendingAction = vendingMachineStatus.getVendingButton().getVendingAction();
+		VendingMachineStatus newVmsState;
+		switch (vendingAction) {
+			case VEND:
+				newVmsState = selectProduct(vendingMachineStatus);
+			break;
+			case COIN_RETURN:
+				newVmsState = returnCoins(vendingMachineStatus);
+				break;
+			case NONE:
+				newVmsState = vendingMachineStatus;
+				break;
+			default:
+				throw new RuntimeException("Machine temporarily out of order.");
+		}
+
+		return newVmsState;
 	}
 }

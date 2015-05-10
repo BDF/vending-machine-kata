@@ -102,7 +102,7 @@ public class VendingMachineTest {
 
 		assertEquals(0, vms.getCoinsAccumulated().total());
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
-		assertEquals(Product.NO_PRODUCT_SELECTED , vms.getProductSelected());
+		assertEquals(Product.NO_PRODUCT_SELECTED , vms.getVendingButton().getAssociatedProduct());
 		assertEquals(10, vms.getCoinsReturned().total());
 	}
 
@@ -123,9 +123,30 @@ public class VendingMachineTest {
 
 		assertEquals(0, vms.getCoinsAccumulated().total());
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
-		assertEquals(Product.NO_PRODUCT_SELECTED , vms.getProductSelected());
+		assertEquals(Product.NO_PRODUCT_SELECTED , vms.getVendingButton().getAssociatedProduct());
 		assertEquals(40, vms.getCoinsReturned().total());
 		assertEquals(3, vms.getCoinsReturned().getCoinCount());
+	}
+
+	@Test
+	public void whenReturnCoinsSelectedDisplayShouldBeINSERTCOINSAndCoinsAreReturned() {
+		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		MeasuredCoin measuredCoin = new MeasuredCoin(25);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		VendingButton vendingButton = new VendingButton(VendingAction.COIN_RETURN, Product.NO_PRODUCT_SELECTED);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+
+		VendingMachineStatus newState = vendingMachine.selectButton(vms);
+
+		assertEquals(50, newState.getCoinsReturned().total());
+		assertEquals(2, newState.getCoinsReturned().getCoinCount());
+
+		assertEquals(0, newState.getCoinsAccumulated().total());
+		assertEquals(0, newState.getCoinsAccumulated().getCoinCount());
+
+		assertEquals("INSERT COIN", newState.getMachineDisplay().getDisplay());
+
 	}
 
 

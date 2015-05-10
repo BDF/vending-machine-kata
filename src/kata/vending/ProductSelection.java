@@ -30,5 +30,11 @@ public class ProductSelection {
 		return retProduct;
 	}
 
+	public List<Product> getAllProducts() {
+		List<Product> allProducts= new ArrayList<>(products.size());
+		allProducts.addAll(products.values());
+		return allProducts;
+	}
+
 
 }

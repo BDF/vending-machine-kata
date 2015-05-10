@@ -8,7 +8,7 @@ package kata.vending;
 public class VendingMachineStatus {
 	private final CoinsAccumulated coinsAccumulated;
 	private final MachineDisplay machineDisplay;
-	private final Product productSelected;
+	private final VendingButton vendingButton;
 	private final CoinsAccumulated coinsReturned;
 
 	public VendingMachineStatus(CoinsAccumulated coinsAccumulated,
@@ -16,7 +16,7 @@ public class VendingMachineStatus {
 	                            CoinsAccumulated coinsReturned) {
 		this.coinsAccumulated = coinsAccumulated;
 		this.machineDisplay = machineDisplay;
-		this.productSelected = Product.NO_PRODUCT_SELECTED;
+		this.vendingButton = new VendingButton(VendingAction.NONE, Product.NO_PRODUCT_SELECTED);;
 		this.coinsReturned = coinsReturned;
 	}
 
@@ -24,14 +24,14 @@ public class VendingMachineStatus {
 	                            MachineDisplay machineDisplay) {
 		this.coinsAccumulated = coinsAccumulated;
 		this.machineDisplay = machineDisplay;
-		this.productSelected = Product.NO_PRODUCT_SELECTED;
+		this.vendingButton = new VendingButton(VendingAction.NONE, Product.NO_PRODUCT_SELECTED);;
 		this.coinsReturned = new CoinsAccumulated();
 	}
 
 	public VendingMachineStatus() {
 		this.coinsAccumulated = new CoinsAccumulated();
 		this.machineDisplay = new MachineDisplay("INSERT COINS");
-		this.productSelected = Product.NO_PRODUCT_SELECTED;
+		this.vendingButton = new VendingButton(VendingAction.NONE, Product.NO_PRODUCT_SELECTED);;
 		this.coinsReturned = new CoinsAccumulated();
 	}
 
@@ -41,7 +41,17 @@ public class VendingMachineStatus {
 		Product productSelected) {
 		this.coinsAccumulated = coinsAccumulated;
 		this.machineDisplay = machineDisplay;
-		this.productSelected = productSelected;
+		this.vendingButton = new VendingButton(VendingAction.NONE, productSelected);
+		this.coinsReturned = new CoinsAccumulated();
+	}
+
+	public VendingMachineStatus(
+		CoinsAccumulated coinsAccumulated,
+		MachineDisplay machineDisplay,
+		VendingButton vendingButton) {
+		this.coinsAccumulated = coinsAccumulated;
+		this.machineDisplay = machineDisplay;
+		this.vendingButton = vendingButton;
 		this.coinsReturned = new CoinsAccumulated();
 	}
 
@@ -53,8 +63,8 @@ public class VendingMachineStatus {
 		return machineDisplay;
 	}
 
-	public Product getProductSelected() {
-		return productSelected;
+	public VendingButton getVendingButton() {
+		return vendingButton;
 	}
 
 	public CoinsAccumulated getCoinsReturned() {

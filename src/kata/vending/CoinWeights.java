@@ -6,7 +6,7 @@ package kata.vending;
  * @author bforeste
  */
 public interface CoinWeights {
-	public static float NOT_RECOGNIZED = Float.MIN_VALUE;
+	public static MeasuredCoin NOT_RECOGNIZED = new MeasuredCoin(Integer.MIN_VALUE);
 
-	float measureCoin(double weight, double diameter);
+	MeasuredCoin measureCoin(UnknownCoin unknownCoin);
 }

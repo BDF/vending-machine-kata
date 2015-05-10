@@ -9,10 +9,10 @@ public class CACoinWeights implements  CoinWeights {
 
 
 	@Override
-	public float measureCoin(double weight, double diameter) {
+	public MeasuredCoin measureCoin(UnknownCoin unknownCoin) {
 
-		if (weight == 3.95d && diameter == 21.2d) {
-			return 0.5f;
+		if (unknownCoin.getWeight()== 3.95d && unknownCoin.getDiameter()== 21.2d) {
+			return new MeasuredCoin(5);
 		}
 
 		return NOT_RECOGNIZED;

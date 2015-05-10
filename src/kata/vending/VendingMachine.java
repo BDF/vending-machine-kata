@@ -40,7 +40,7 @@ public class VendingMachine {
 			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getVendingButton());
 		} else  if (total >= product.getCost()) {
 			if (productStatus.retrieveProduct(product)) {
-				newMachineStatus = vendProduct(total, product);
+				newMachineStatus = vendProduct(vendingMachineStatus);
 			} else {
 				newMachineStatus = soldOutProduct(vendingMachineStatus);
 			}
@@ -67,11 +67,23 @@ public class VendingMachine {
 		return newMachineStatus;
 	}
 
-	private VendingMachineStatus vendProduct(int total, Product product) {
-		VendingMachineStatus newMachineStatus;MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
+	private VendingMachineStatus vendProduct(VendingMachineStatus vendingMachineStatus) {
+		CoinsAccumulated coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
+		int total = coinsAccumulated.total();
+		Product product = vendingMachineStatus.getVendingButton().getAssociatedProduct();
+		VendingMachineStatus newMachineStatus;
+		MachineDisplay machineDisplay;
 		int changeReturned = total - product.getCost();
-		CoinsAccumulated coinsReturned = coinExchanger.getChange(new CoinsAccumulated(), changeReturned );
-		newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
+		ChangeInCoins changeStatus = coinExchanger.getChange(vendingMachineStatus.getCoinsAccumulated(), changeReturned);
+		CoinsAccumulated coinsReturned = changeStatus.getChangeInCoins();
+		if (changeStatus.isSuccessCoinReturn()) {
+			machineDisplay = new MachineDisplay("THANK YOU");
+			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
+		} else {
+			machineDisplay = new MachineDisplay("EXACT CHANGE ONLY");
+			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
+		}
+
 		return newMachineStatus;
 	}
 

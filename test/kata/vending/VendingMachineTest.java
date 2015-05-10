@@ -21,7 +21,12 @@ public class VendingMachineTest {
 		CoinWeightFactory cwf = new CoinWeightFactory();
 		Map<Product, Integer> productToCounts = getProductCounts(productSelection, productCounts);
 		ProductStatus products = new ProductStatus(productToCounts);
-		VendingMachine vendingMachine = new VendingMachine(cwf.buildUsCoinSystem(), new CoinExchanger(), products);
+		Map<MeasuredCoin, Integer> inCoinsToCount = new HashMap<>();
+		inCoinsToCount.put(new MeasuredCoin(25), 5);
+		inCoinsToCount.put(new MeasuredCoin(10), 5);
+		inCoinsToCount.put(new MeasuredCoin(5), 5);
+
+		VendingMachine vendingMachine = new VendingMachine(cwf.buildUsCoinSystem(), new CoinExchanger(inCoinsToCount), products);
 		return vendingMachine;
 	}
 

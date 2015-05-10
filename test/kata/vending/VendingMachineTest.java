@@ -88,5 +88,23 @@ public class VendingMachineTest {
 	}
 
 
+	@Test
+	public void whenCoinsAccumulatedExceedsProductCostReturnExtras() {
+		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		MeasuredCoin measuredCoin = new MeasuredCoin(25);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		assertEquals(75, coinsAccumulated.total());
+		Product product = productSelection.getProduct("candy");
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
+		vms = vendingMachine.selectProduct(vms);
+
+		assertEquals(0, vms.getCoinsAccumulated().total());
+		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
+		assertEquals(Product.NO_PRODUCT_SELECTED , vms.getProductSelected());
+		assertEquals(10, vms.getCoinsReturned().total());
+	}
+
 
 }

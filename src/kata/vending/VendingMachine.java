@@ -37,7 +37,10 @@ public class VendingMachine {
 			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
 		} else  if (total >= product.getCost()) {
 			MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
-			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay);
+			int coinReturn = total - product.getCost();
+			CoinsAccumulated coinsReturned = new CoinsAccumulated();
+			coinsReturned = coinsReturned.addCoin(new MeasuredCoin(coinReturn));
+			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
 		} else if (total > 0) {
 			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(product.getCost());
 			MachineDisplay machineDisplay = new MachineDisplay("PRICE " + coinDisplay.getDisplay());

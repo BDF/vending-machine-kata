@@ -6,6 +6,7 @@ package kata.vending;
  * @author bforeste
  */
 public class Product {
+	public static final Product NO_PRODUCT_SELECTED = new Product("NONE", 0);
 	public static final Product NOT_FOUND = new Product("", Integer.MIN_VALUE);
 
 	private final String name;

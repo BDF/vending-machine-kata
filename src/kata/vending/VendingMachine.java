@@ -16,37 +16,44 @@ public class VendingMachine {
 	/**
 	 * When the respective button is pressed and enough money has been inserted, the product is dispensed and the
 	 * machine displays THANK YOU. If the display is checked again, it will display INSERT COINS and the current
-	 * amount will be set to $0.00. If there is not enough money inserted then the machine displays PRICE and the
+	 * amount will be set to $0.00.
+	 *
+	 * If there is not enough money inserted then the machine displays PRICE and the
 	 * price of the item and subsequent checks of the display will display either INSERT COINS or the current amount
 	 * as appropriate.
 	 */
-	public VendingMachineStatus selectProduct(Product product, CoinsAccumulated coinsAccumulated) {
+	public VendingMachineStatus selectProduct(VendingMachineStatus vendingMachineStatus) {
+		CoinsAccumulated coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
 		int total = coinsAccumulated.total();
-		VendingMachineStatus vendingMachineStatus;
-		MachineDisplay machineDisplay;
-		if (total >= product.getCost()) {
-			machineDisplay = new MachineDisplay("THANK YOU");
-			vendingMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay);
+		VendingMachineStatus newMachineStatus;
+		CoinsAccumulated newCoinsAccumulated;
+		Product product = vendingMachineStatus.getProductSelected();
+
+		if ("THANK YOU".equals(vendingMachineStatus.getMachineDisplay().getDisplay())) {
+			newMachineStatus = new VendingMachineStatus();
+		} else if (Product.NO_PRODUCT_SELECTED.equals(product)) {
+			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(vendingMachineStatus.getCoinsAccumulated().total());
+			MachineDisplay machineDisplay = new MachineDisplay(coinDisplay.getDisplay());
+			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
+		} else  if (total >= product.getCost()) {
+			MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
+			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay);
+		} else if (total > 0) {
+			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(product.getCost());
+			MachineDisplay machineDisplay = new MachineDisplay("PRICE " + coinDisplay.getDisplay());
+			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
 		} else {
-			machineDisplay = new MachineDisplay("PRICE");
-			vendingMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay);
+			MachineDisplay machineDisplay  = vendingMachineStatus.getMachineDisplay();
+			newCoinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
+			newMachineStatus = new VendingMachineStatus(newCoinsAccumulated, machineDisplay);
 		}
 
-		return vendingMachineStatus;
+		return newMachineStatus;
 	}
 
-	public  VendingMachineStatus checkDisplay(VendingMachineStatus vendingMachineStatus) {
-		MachineDisplay newMachineDisplay;
-		CoinsAccumulated coinsAccumulated;
-		if ("THANK YOU".equals(vendingMachineStatus.getMachineDisplay().getDisplay())) {
-			newMachineDisplay = new MachineDisplay("INSERT COINS");
-			coinsAccumulated = new CoinsAccumulated();
-		} else {
-			newMachineDisplay = vendingMachineStatus.getMachineDisplay();
-			coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
-		}
-
-		return new VendingMachineStatus(coinsAccumulated, newMachineDisplay);
+	public VendingMachineStatus addCoin(VendingMachineStatus vendingMachineStatus, MeasuredCoin coin) {
+		CoinsAccumulated allCoins = vendingMachineStatus.getCoinsAccumulated().addCoin(coin);
+		return new VendingMachineStatus(allCoins, vendingMachineStatus.getMachineDisplay(), vendingMachineStatus.getProductSelected());
 	}
 
 	public CoinDisplay getCoinDisplay(VendingMachineStatus vendingMachineStatus) {

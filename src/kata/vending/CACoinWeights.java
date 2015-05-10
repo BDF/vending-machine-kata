@@ -21,6 +21,7 @@ public class CACoinWeights implements  CoinWeights {
 		listOfFun = new ArrayList<Function<UnknownCoin, MeasuredCoin>>();
 		listOfFun.add(buildPredicate(3.95d, 21.2d, 5));
 		listOfFun.add(buildPredicate(1.75d, 18.03d, 10));
+		listOfFun.add(buildPredicate(4.4d, 23.88d, 25));
 	}
 
 	private Function<UnknownCoin, MeasuredCoin> buildPredicate(final double inWeight, final double inDiameter, final int inValue) {

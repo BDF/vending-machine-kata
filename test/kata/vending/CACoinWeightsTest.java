@@ -42,4 +42,13 @@ public class CACoinWeightsTest {
 		assertEquals("Should have a value of 10", 10, value.getValue());
 	}
 
+	@Test
+	public void shouldBeValid2001CAQuarter() {
+		double weight = 4.4d;
+		double diameter = 23.88d;
+		UnknownCoin uc = new UnknownCoin(weight, diameter);
+		MeasuredCoin value = coinWeights.measureCoin(uc);
+		assertEquals("Should have a value of 25", 25, value.getValue());
+	}
+
 }

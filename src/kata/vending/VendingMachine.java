@@ -6,6 +6,12 @@ package kata.vending;
  * @author bforeste
  */
 public class VendingMachine {
+	private final CoinWeights coinWeights;
+
+	public VendingMachine(CoinWeights coinWeights) {
+		this.coinWeights = coinWeights;
+	}
+
 
 	/**
 	 * When the respective button is pressed and enough money has been inserted, the product is dispensed and the
@@ -14,17 +20,37 @@ public class VendingMachine {
 	 * price of the item and subsequent checks of the display will display either INSERT COINS or the current amount
 	 * as appropriate.
 	 */
-	public CoinDisplay selectProduct(Product product, CoinsAccumulated coinsAccumulated) {
+	public VendingMachineStatus selectProduct(Product product, CoinsAccumulated coinsAccumulated) {
 		int total = coinsAccumulated.total();
-
-		CoinDisplay coinDisplay;
+		VendingMachineStatus vendingMachineStatus;
+		MachineDisplay machineDisplay;
 		if (total >= product.getCost()) {
-			coinDisplay = new CoinDisplay("THANK YOU");
+			machineDisplay = new MachineDisplay("THANK YOU");
+			vendingMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay);
 		} else {
-			coinDisplay = new CoinDisplay("PRICE");
+			machineDisplay = new MachineDisplay("PRICE");
+			vendingMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay);
 		}
 
-		return coinDisplay;
+		return vendingMachineStatus;
 	}
 
+	public  VendingMachineStatus checkDisplay(VendingMachineStatus vendingMachineStatus) {
+		MachineDisplay newMachineDisplay;
+		CoinsAccumulated coinsAccumulated;
+		if ("THANK YOU".equals(vendingMachineStatus.getMachineDisplay().getDisplay())) {
+			newMachineDisplay = new MachineDisplay("INSERT COINS");
+			coinsAccumulated = new CoinsAccumulated();
+		} else {
+			newMachineDisplay = vendingMachineStatus.getMachineDisplay();
+			coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
+		}
+
+		return new VendingMachineStatus(coinsAccumulated, newMachineDisplay);
+	}
+
+	public CoinDisplay getCoinDisplay(VendingMachineStatus vendingMachineStatus) {
+		CoinDisplay coinDisplay = coinWeights.getCoinDisplay(vendingMachineStatus.getCoinsAccumulated().total());
+		return coinDisplay;
+	}
 }

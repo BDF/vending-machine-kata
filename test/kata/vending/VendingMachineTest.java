@@ -10,7 +10,8 @@ public class VendingMachineTest {
 	private  ProductSelection productSelection;
 	@Before
 	public void before() {
-		vendingMachine = new VendingMachine();
+		CoinWeightFactory cwf = new CoinWeightFactory();
+		vendingMachine = new VendingMachine(cwf.buildUsCoinSystem());
 		productSelection = new ProductSelection();
 	}
 
@@ -24,8 +25,13 @@ public class VendingMachineTest {
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 
-		CoinDisplay display = vendingMachine.selectProduct(product, coinsAccumulated);
-		assertEquals("THANK YOU", display.getDisplay());
+		VendingMachineStatus vms = vendingMachine.selectProduct(product, coinsAccumulated);
+		assertEquals("THANK YOU", vms.getMachineDisplay().getDisplay());
+
+		VendingMachineStatus vms2 = vendingMachine.checkDisplay(vms);
+		assertEquals("INSERT COINS", vms2.getMachineDisplay().getDisplay());
+		assertEquals(0, vms.getCoinsAccumulated().total());
+		assertEquals("$0.00", vendingMachine.getCoinDisplay(vms2).getDisplay());
 	}
 
 	@Test
@@ -34,8 +40,10 @@ public class VendingMachineTest {
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
-		CoinDisplay display = vendingMachine.selectProduct(product, coinsAccumulated);
-		assertEquals("PRICE", display.getDisplay());
+		VendingMachineStatus vms= vendingMachine.selectProduct(product, coinsAccumulated);
+		assertEquals("PRICE", vms.getMachineDisplay().getDisplay());
 	}
+
+
 
 }

@@ -10,14 +10,15 @@ public class CoinAccumulatorTest {
 
 	@Before
 	public void before() {
-		coinAccumulator = new CoinAccumulator(new CACoinWeights());
+		CoinWeightFactory cwf = new CoinWeightFactory();
+		coinAccumulator = new CoinAccumulator(cwf.buildUsCoinSystem());
 	}
 
 	@Test
 	public void whenNoCoinsInsertedDisplayIsINSERTCOIN() {
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
-		CoinDisplay coinDisplay =  coinAccumulator.checkCoinStatus(coinsAccumulated);
-		assertEquals("INSERT COIN", coinDisplay.getDisplay());
+		MachineDisplay machineDisplay =  coinAccumulator.checkCoinStatus(coinsAccumulated);
+		assertEquals("INSERT COIN", machineDisplay.getDisplay());
 	}
 
 	@Test

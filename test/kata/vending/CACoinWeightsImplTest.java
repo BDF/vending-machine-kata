@@ -5,14 +5,14 @@ import org.junit.Test;
 
 import static org.junit.Assert.*;
 
-public class CACoinWeightsTest {
+public class CACoinWeightsImplTest {
 
 	private CoinWeights coinWeights;
 
 	@Before
 	public void before() {
-		coinWeights = new CACoinWeights();
-
+		CoinWeightFactory cwf = new CoinWeightFactory();
+		coinWeights = cwf.buildCaCoinSystem();
 	}
 
 	@Test

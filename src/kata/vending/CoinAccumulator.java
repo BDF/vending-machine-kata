@@ -12,15 +12,15 @@ public class CoinAccumulator {
 		this.coinWeights = coinWeights;
 	}
 
-	public CoinDisplay checkCoinStatus(CoinsAccumulated coinsAccumalated) {
-		CoinDisplay coinDisplay;
+	public MachineDisplay checkCoinStatus(CoinsAccumulated coinsAccumalated) {
+		MachineDisplay machineDisplay;
 		if (coinsAccumalated.getCoinCount() == 0) {
-			coinDisplay = new CoinDisplay("INSERT COIN");
+			machineDisplay = new MachineDisplay("INSERT COIN");
 		} else {
-			coinDisplay = null;
+			machineDisplay = null;
 		}
 
-		return coinDisplay;
+		return machineDisplay;
 	}
 
 

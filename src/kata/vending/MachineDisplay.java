@@ -5,13 +5,11 @@ package kata.vending;
  *
  * @author bforeste
  */
-public class CoinDisplay {
+public class MachineDisplay {
 	private final String display;
 
-
-	public CoinDisplay(String display) {
+	public MachineDisplay(String display) {
 		this.display = display;
-
 	}
 
 	public String getDisplay() {

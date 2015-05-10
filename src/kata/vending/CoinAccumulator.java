@@ -13,7 +13,14 @@ public class CoinAccumulator {
 	}
 
 	public CoinDisplay checkCoinStatus(CoinsAccumulated coinsAccumalated) {
-		return null;
+		CoinDisplay coinDisplay;
+		if (coinsAccumalated.getCoinCount() == 0) {
+			coinDisplay = new CoinDisplay("INSERT COIN");
+		} else {
+			coinDisplay = null;
+		}
+
+		return coinDisplay;
 	}
 
 

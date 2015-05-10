@@ -7,11 +7,12 @@ package kata.vending;
  */
 public class VendingMachine {
 	private final CoinWeights coinWeights;
+	private final CoinExchanger coinExchanger;
 
-	public VendingMachine(CoinWeights coinWeights) {
+	public VendingMachine(CoinWeights coinWeights, CoinExchanger coinExchanger) {
 		this.coinWeights = coinWeights;
+		this.coinExchanger = coinExchanger;
 	}
-
 
 	/**
 	 * When the respective button is pressed and enough money has been inserted, the product is dispensed and the
@@ -37,9 +38,8 @@ public class VendingMachine {
 			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getProductSelected());
 		} else  if (total >= product.getCost()) {
 			MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
-			int coinReturn = total - product.getCost();
-			CoinsAccumulated coinsReturned = new CoinsAccumulated();
-			coinsReturned = coinsReturned.addCoin(new MeasuredCoin(coinReturn));
+			int changeReturned = total - product.getCost();
+			CoinsAccumulated coinsReturned = coinExchanger.getChange(new CoinsAccumulated(), changeReturned );
 			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
 		} else if (total > 0) {
 			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(product.getCost());

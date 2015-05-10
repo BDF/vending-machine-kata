@@ -1,3 +1,5 @@
+*.iml
+*.idea
 *~
 *.swp
 .DS_Store

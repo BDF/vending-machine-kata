@@ -168,7 +168,6 @@ public class VendingMachineTest {
 
 		assertEquals(0, newState.getCoinsAccumulated().total());
 		assertEquals(0, newState.getCoinsAccumulated().getCoinCount());
-
 		assertEquals("INSERT COIN", newState.getMachineDisplay().getDisplay());
 	}
 
@@ -204,11 +203,20 @@ public class VendingMachineTest {
 		assertEquals(VendingAction.NONE, outOfProduct.getVendingButton().getVendingAction());
 		assertEquals(0, outOfProduct.getCoinsReturned().total());
 		assertEquals(0, outOfProduct.getCoinsReturned().getCoinCount());
+
+
+		VendingMachineStatus checkCurrentState = vendingMachine.selectButton(outOfProduct);
+		assertEquals("$0.50", checkCurrentState.getMachineDisplay().getDisplay());
+
+		VendingMachineStatus returnCoins = new VendingMachineStatus(
+			checkCurrentState.getCoinsAccumulated(),
+			checkCurrentState.getMachineDisplay(),
+			new VendingButton(VendingAction.COIN_RETURN, Product.NO_PRODUCT_SELECTED));
+
+		VendingMachineStatus  finalState = vendingMachine.selectButton(returnCoins);
+		assertEquals("INSERT COIN", finalState.getMachineDisplay().getDisplay());
 	}
 
-
-	@Test
-	public void 
 
 	public Map<Product,Integer> getProductCounts(ProductSelection productSelection, int counts) {
 		Map<Product,Integer> productCounts = new HashMap<>();

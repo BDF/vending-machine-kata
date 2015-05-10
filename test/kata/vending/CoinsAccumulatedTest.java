@@ -12,4 +12,13 @@ public class CoinsAccumulatedTest {
 		assertEquals(0, accumulated.getCoinCount());
 	}
 
+	@Test
+	public void shouldGiveCorrectTotal() {
+		CoinsAccumulated accumulated = new CoinsAccumulated();
+		accumulated = accumulated.addCoin(new MeasuredCoin(10));
+		accumulated = accumulated.addCoin(new MeasuredCoin(25));
+		assertEquals(35, accumulated.total());
+
+	}
+
 }

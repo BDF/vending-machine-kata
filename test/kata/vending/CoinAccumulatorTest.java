@@ -20,5 +20,13 @@ public class CoinAccumulatorTest {
 		assertEquals("INSERT COIN", coinDisplay.getDisplay());
 	}
 
+	@Test
+	public void whenInvalidCoinIsInsertedItIsReturned() {
+		UnknownCoin unknownCoin = new UnknownCoin(0.0d, 0.0d);
+		CoinsAccumulated accumulated = coinAccumulator.insertCoin(unknownCoin);
+		assertEquals(0, accumulated.getCoinCount());
+
+	}
+
 
 }

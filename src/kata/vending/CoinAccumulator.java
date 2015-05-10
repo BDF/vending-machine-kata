@@ -24,6 +24,15 @@ public class CoinAccumulator {
 	}
 
 
+	public CoinsAccumulated insertCoin(UnknownCoin unknownCoin) {
+		MeasuredCoin result = coinWeights.measureCoin(unknownCoin);
+		CoinsAccumulated coinsAccumulated;
+		if (CoinWeights.NOT_RECOGNIZED != result) {
+			coinsAccumulated = null;
+		} else {
+			coinsAccumulated = new CoinsAccumulated();
+		}
 
-
+		return coinsAccumulated;
+	}
 }

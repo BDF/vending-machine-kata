@@ -17,14 +17,14 @@ public class VendingMachineTest {
 		productSelection = new ProductSelection();
 	}
 
-	public VendingMachine buildVendingMaching(int productCounts) {
+	public VendingMachine buildVendingMaching(int productCounts, int coinCounts) {
 		CoinWeightFactory cwf = new CoinWeightFactory();
 		Map<Product, Integer> productToCounts = getProductCounts(productSelection, productCounts);
 		ProductStatus products = new ProductStatus(productToCounts);
 		Map<MeasuredCoin, Integer> inCoinsToCount = new HashMap<>();
-		inCoinsToCount.put(new MeasuredCoin(25), 5);
-		inCoinsToCount.put(new MeasuredCoin(10), 5);
-		inCoinsToCount.put(new MeasuredCoin(5), 5);
+		inCoinsToCount.put(new MeasuredCoin(25), coinCounts);
+		inCoinsToCount.put(new MeasuredCoin(10), coinCounts);
+		inCoinsToCount.put(new MeasuredCoin(5), coinCounts);
 
 		VendingMachine vendingMachine = new VendingMachine(cwf.buildUsCoinSystem(), new CoinExchanger(inCoinsToCount), products);
 		return vendingMachine;
@@ -32,7 +32,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whereGivenEnoughMoneyForProductSaysThankYou() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		Product product = productSelection.getProduct("cola");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
@@ -53,7 +53,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whereGivenInsufficientFundsForProductSaysPrice() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		Product product = productSelection.getProduct("candy");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
@@ -66,7 +66,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whereIterativeAdditionsOfCoinsEventuallyGivenINSERTCOINS() {
-		VendingMachine vendingMachine = buildVendingMaching(3);
+		VendingMachine vendingMachine = buildVendingMaching(3, 5);
 		Product product = productSelection.getProduct("candy");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
@@ -91,7 +91,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whereNoProductSelectedGivesCurrentTotal() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		Product product = Product.NO_PRODUCT_SELECTED;
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(5);
@@ -114,7 +114,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenCoinsAccumulatedExceedsProductCostReturnExtras() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -134,7 +134,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenCoinsAccumulatedExceedsByProductCostMultipleCoinsReturnExtras() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -158,7 +158,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenReturnCoinsSelectedDisplayShouldBeINSERTCOINSAndCoinsAreReturned() {
-		VendingMachine vendingMachine = buildVendingMaching(2);
+		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -178,7 +178,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenProductIsOutOfStockDisplaySoldOut() {
-		VendingMachine vendingMachine = buildVendingMaching(1);
+		VendingMachine vendingMachine = buildVendingMaching(1, 5);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -209,7 +209,6 @@ public class VendingMachineTest {
 		assertEquals(0, outOfProduct.getCoinsReturned().total());
 		assertEquals(0, outOfProduct.getCoinsReturned().getCoinCount());
 
-
 		VendingMachineStatus checkCurrentState = vendingMachine.selectButton(outOfProduct);
 		assertEquals("$0.50", checkCurrentState.getMachineDisplay().getDisplay());
 
@@ -220,6 +219,31 @@ public class VendingMachineTest {
 
 		VendingMachineStatus  finalState = vendingMachine.selectButton(returnCoins);
 		assertEquals("INSERT COIN", finalState.getMachineDisplay().getDisplay());
+	}
+
+	@Test
+	public void whenWeCantGiveProperChangeShowUseExactChangeAndReturnAllChange() {
+		VendingMachine vendingMachine = buildVendingMaching(1, 0);
+		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		MeasuredCoin measuredCoin = new MeasuredCoin(25);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		Product candy = productSelection.getProduct("candy");
+
+		VendingMachineStatus vms = new VendingMachineStatus(
+			coinsAccumulated,
+			new MachineDisplay("INSERT COINS"),
+			new VendingButton(VendingAction.VEND, candy));
+
+		VendingMachineStatus current = vendingMachine.selectButton(vms);
+
+		assertEquals("EXACT CHANGE ONLY", current.getMachineDisplay().getDisplay());
+		assertEquals(0, current.getCoinsAccumulated().getCoinCount());
+		assertSame(coinsAccumulated, current.getCoinsReturned());
+
+		assertEquals(Product.NO_PRODUCT_SELECTED, current.getVendingButton().getAssociatedProduct());
+		assertEquals(VendingAction.NONE, current.getVendingButton().getVendingAction());
 	}
 
 

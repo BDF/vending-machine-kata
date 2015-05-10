@@ -8,10 +8,12 @@ package kata.vending;
 public class VendingMachine {
 	private final CoinWeights coinWeights;
 	private final CoinExchanger coinExchanger;
+	private final ProductStatus productStatus;
 
-	public VendingMachine(CoinWeights coinWeights, CoinExchanger coinExchanger) {
+	public VendingMachine(CoinWeights coinWeights, CoinExchanger coinExchanger, ProductStatus productStatus) {
 		this.coinWeights = coinWeights;
 		this.coinExchanger = coinExchanger;
+		this.productStatus = productStatus;
 	}
 
 	/**
@@ -23,7 +25,7 @@ public class VendingMachine {
 	 * price of the item and subsequent checks of the display will display either INSERT COINS or the current amount
 	 * as appropriate.
 	 */
-	public VendingMachineStatus selectProduct(VendingMachineStatus vendingMachineStatus) {
+	private VendingMachineStatus selectProduct(VendingMachineStatus vendingMachineStatus) {
 		CoinsAccumulated coinsAccumulated = vendingMachineStatus.getCoinsAccumulated();
 		int total = coinsAccumulated.total();
 		VendingMachineStatus newMachineStatus;
@@ -37,10 +39,11 @@ public class VendingMachine {
 			MachineDisplay machineDisplay = new MachineDisplay(coinDisplay.getDisplay());
 			newMachineStatus = new VendingMachineStatus(coinsAccumulated, machineDisplay, vendingMachineStatus.getVendingButton());
 		} else  if (total >= product.getCost()) {
-			MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
-			int changeReturned = total - product.getCost();
-			CoinsAccumulated coinsReturned = coinExchanger.getChange(new CoinsAccumulated(), changeReturned );
-			newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
+			if (productStatus.retrieveProduct(product)) {
+				newMachineStatus = vendProduct(total, product);
+			} else {
+				newMachineStatus = soldOutProduct(vendingMachineStatus);
+			}
 		} else if (total > 0) {
 			CoinDisplay coinDisplay = coinWeights.getCoinDisplay(product.getCost());
 			MachineDisplay machineDisplay = new MachineDisplay("PRICE " + coinDisplay.getDisplay());
@@ -51,6 +54,24 @@ public class VendingMachine {
 			newMachineStatus = new VendingMachineStatus(newCoinsAccumulated, machineDisplay);
 		}
 
+		return newMachineStatus;
+	}
+
+	private VendingMachineStatus soldOutProduct(VendingMachineStatus vms) {
+		VendingMachineStatus newMachineStatus;
+		MachineDisplay machineDisplay = new MachineDisplay("SOLD OUT");
+		newMachineStatus = new VendingMachineStatus(
+			vms.getCoinsAccumulated(),
+			machineDisplay,
+			new VendingButton(VendingAction.NONE, Product.NO_PRODUCT_SELECTED));
+		return newMachineStatus;
+	}
+
+	private VendingMachineStatus vendProduct(int total, Product product) {
+		VendingMachineStatus newMachineStatus;MachineDisplay machineDisplay = new MachineDisplay("THANK YOU");
+		int changeReturned = total - product.getCost();
+		CoinsAccumulated coinsReturned = coinExchanger.getChange(new CoinsAccumulated(), changeReturned );
+		newMachineStatus = new VendingMachineStatus(new CoinsAccumulated(), machineDisplay, coinsReturned);
 		return newMachineStatus;
 	}
 
@@ -82,7 +103,7 @@ public class VendingMachine {
 				newVmsState = returnCoins(vendingMachineStatus);
 				break;
 			case NONE:
-				newVmsState = vendingMachineStatus;
+				newVmsState = selectProduct(vendingMachineStatus);
 				break;
 			default:
 				throw new RuntimeException("Machine temporarily out of order.");

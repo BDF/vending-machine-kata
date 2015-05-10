@@ -1,5 +1,8 @@
 package kata.vending;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Created by bforeste on 5/10/15.
  *
@@ -32,16 +35,6 @@ public class VendingMachineStatus {
 		this.coinsAccumulated = new CoinsAccumulated();
 		this.machineDisplay = new MachineDisplay("INSERT COINS");
 		this.vendingButton = new VendingButton(VendingAction.NONE, Product.NO_PRODUCT_SELECTED);;
-		this.coinsReturned = new CoinsAccumulated();
-	}
-
-	public VendingMachineStatus(
-		CoinsAccumulated coinsAccumulated,
-		MachineDisplay machineDisplay,
-		Product productSelected) {
-		this.coinsAccumulated = coinsAccumulated;
-		this.machineDisplay = machineDisplay;
-		this.vendingButton = new VendingButton(VendingAction.NONE, productSelected);
 		this.coinsReturned = new CoinsAccumulated();
 	}
 

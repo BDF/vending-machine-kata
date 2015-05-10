@@ -8,6 +8,5 @@ package kata.vending;
 public enum VendingAction {
 	NONE,
 	VEND,
-	COIN_RETURN,
-	COIN_ADDED;
+	COIN_RETURN;
 }

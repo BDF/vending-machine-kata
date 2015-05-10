@@ -3,20 +3,31 @@ package kata.vending;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static org.junit.Assert.*;
 
 public class VendingMachineTest {
-	private  VendingMachine vendingMachine;
 	private  ProductSelection productSelection;
+	private Map<Product, Integer> productCounts;
+
 	@Before
 	public void before() {
-		CoinWeightFactory cwf = new CoinWeightFactory();
-		vendingMachine = new VendingMachine(cwf.buildUsCoinSystem(), new CoinExchanger());
 		productSelection = new ProductSelection();
+	}
+
+	public VendingMachine buildVendingMaching(int productCounts) {
+		CoinWeightFactory cwf = new CoinWeightFactory();
+		Map<Product, Integer> productToCounts = getProductCounts(productSelection, productCounts);
+		ProductStatus products = new ProductStatus(productToCounts);
+		VendingMachine vendingMachine = new VendingMachine(cwf.buildUsCoinSystem(), new CoinExchanger(), products);
+		return vendingMachine;
 	}
 
 	@Test
 	public void whereGivenEnoughMoneyForProductSaysThankYou() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		Product product = productSelection.getProduct("cola");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
@@ -24,11 +35,12 @@ public class VendingMachineTest {
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms = vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms = vendingMachine.selectButton(vms);
 		assertEquals("THANK YOU", vms.getMachineDisplay().getDisplay());
 
-		VendingMachineStatus vms2 = vendingMachine.selectProduct(vms);
+		VendingMachineStatus vms2 = vendingMachine.selectButton(vms);
 		assertEquals("INSERT COINS", vms2.getMachineDisplay().getDisplay());
 		assertEquals(0, vms.getCoinsAccumulated().total());
 		assertEquals("$0.00", vendingMachine.getCoinDisplay(vms2).getDisplay());
@@ -36,60 +48,68 @@ public class VendingMachineTest {
 
 	@Test
 	public void whereGivenInsufficientFundsForProductSaysPrice() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		Product product = productSelection.getProduct("candy");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms= vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("PRICE " + "$0.65" , vms.getMachineDisplay().getDisplay());
 	}
 
 	@Test
 	public void whereIterativeAdditionsOfCoinsEventuallyGivenINSERTCOINS() {
+		VendingMachine vendingMachine = buildVendingMaching(3);
 		Product product = productSelection.getProduct("candy");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms= vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("PRICE " + "$0.65" , vms.getMachineDisplay().getDisplay());
 
 		vms = vendingMachine.addCoin(vms, measuredCoin);
-		vms= vendingMachine.selectProduct(vms);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("PRICE " + "$0.65" , vms.getMachineDisplay().getDisplay());
 
 		vms = vendingMachine.addCoin(vms, measuredCoin);
 		assertTrue(vms.getCoinsAccumulated().total() > 65);
-		vms = vendingMachine.selectProduct(vms);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
 
-		vms = vendingMachine.selectProduct(vms);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("INSERT COINS" , vms.getMachineDisplay().getDisplay());
 	}
 
 	@Test
 	public void whereNoProductSelectedGivesCurrentTotal() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		Product product = Product.NO_PRODUCT_SELECTED;
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(5);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms= vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("$0.05" , vms.getMachineDisplay().getDisplay());
 
 		vms = vendingMachine.addCoin(vms, measuredCoin);
-		vms= vendingMachine.selectProduct(vms);
+		vms= vendingMachine.selectButton(vms);
 		assertEquals("$0.10" , vms.getMachineDisplay().getDisplay());
 
-		vms = new VendingMachineStatus(vms.getCoinsAccumulated(), vms.getMachineDisplay(), productSelection.getProduct("chips"));
-		vms = vendingMachine.selectProduct(vms);
+		VendingButton doVend = new VendingButton(VendingAction.VEND, productSelection.getProduct("chips"));
+		vms = new VendingMachineStatus(vms.getCoinsAccumulated(), vms.getMachineDisplay(), doVend);
+		vms = vendingMachine.selectButton(vms);
 		assertEquals("PRICE $0.50" , vms.getMachineDisplay().getDisplay());
 	}
 
 
 	@Test
 	public void whenCoinsAccumulatedExceedsProductCostReturnExtras() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -97,8 +117,9 @@ public class VendingMachineTest {
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		assertEquals(75, coinsAccumulated.total());
 		Product product = productSelection.getProduct("candy");
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms = vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms = vendingMachine.selectButton(vms);
 
 		assertEquals(0, vms.getCoinsAccumulated().total());
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
@@ -108,6 +129,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenCoinsAccumulatedExceedsByProductCostMultipleCoinsReturnExtras() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -118,8 +140,9 @@ public class VendingMachineTest {
 
 		assertEquals(105, coinsAccumulated.total());
 		Product product = productSelection.getProduct("candy");
-		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), product);
-		vms = vendingMachine.selectProduct(vms);
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("INSERT COINS"), vendingButton);
+		vms = vendingMachine.selectButton(vms);
 
 		assertEquals(0, vms.getCoinsAccumulated().total());
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
@@ -130,6 +153,7 @@ public class VendingMachineTest {
 
 	@Test
 	public void whenReturnCoinsSelectedDisplayShouldBeINSERTCOINSAndCoinsAreReturned() {
+		VendingMachine vendingMachine = buildVendingMaching(2);
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
@@ -146,8 +170,51 @@ public class VendingMachineTest {
 		assertEquals(0, newState.getCoinsAccumulated().getCoinCount());
 
 		assertEquals("INSERT COIN", newState.getMachineDisplay().getDisplay());
+	}
 
+	@Test
+	public void whenProductIsOutOfStockDisplaySoldOut() {
+		VendingMachine vendingMachine = buildVendingMaching(1);
+		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		MeasuredCoin measuredCoin = new MeasuredCoin(25);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
+		Product chips = productSelection.getProduct("chips");
+		VendingButton vendingButton = new VendingButton(VendingAction.VEND, chips);
+		VendingMachineStatus vms = new VendingMachineStatus(coinsAccumulated, new MachineDisplay("$0.50"), vendingButton);
+		vendingMachine.selectButton(vms);
+
+		// Select same product a second time;
+		VendingMachineStatus outOfProduct = vendingMachine.selectButton(vms);
+
+
+		/**
+		As a customer
+		I want to be told when the item I have selected is not available
+		So that I can select another item
+
+		 When the item selected by the customer is out of stock, the machine displays SOLD OUT. If the display is
+		 checked again, it will display the amount of money remaining in the machine or INSERT COIN if there is no
+		 money in the machine.
+		*/
+		assertEquals("SOLD OUT", outOfProduct.getMachineDisplay().getDisplay());
+		assertEquals(50, outOfProduct.getCoinsAccumulated().total());
+		assertEquals(2, outOfProduct.getCoinsAccumulated().getCoinCount());
+		assertEquals(Product.NO_PRODUCT_SELECTED, outOfProduct.getVendingButton().getAssociatedProduct());
+		assertEquals(VendingAction.NONE, outOfProduct.getVendingButton().getVendingAction());
+		assertEquals(0, outOfProduct.getCoinsReturned().total());
+		assertEquals(0, outOfProduct.getCoinsReturned().getCoinCount());
 	}
 
 
+	@Test
+	public void 
+
+	public Map<Product,Integer> getProductCounts(ProductSelection productSelection, int counts) {
+		Map<Product,Integer> productCounts = new HashMap<>();
+		productCounts.put(productSelection.getProduct("chips"), counts);
+		productCounts.put(productSelection.getProduct("cola"), counts);
+		productCounts.put(productSelection.getProduct("candy"), counts);
+		return productCounts;
+	}
 }

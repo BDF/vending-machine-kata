@@ -69,6 +69,7 @@ public class VendingMachineTest {
 		VendingMachine vendingMachine = buildVendingMaching(3, 5);
 		Product product = productSelection.getProduct("candy");
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		UnknownCoin uk = new UnknownCoin(5.670d, 24.26d);
 		MeasuredCoin measuredCoin = new MeasuredCoin(25);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
@@ -76,11 +77,11 @@ public class VendingMachineTest {
 		vms= vendingMachine.selectButton(vms);
 		assertEquals("PRICE " + "$0.65" , vms.getMachineDisplay().getDisplay());
 
-		vms = vendingMachine.addCoin(vms, measuredCoin);
+		vms = vendingMachine.addCoin(vms, uk);
 		vms= vendingMachine.selectButton(vms);
 		assertEquals("PRICE " + "$0.65" , vms.getMachineDisplay().getDisplay());
 
-		vms = vendingMachine.addCoin(vms, measuredCoin);
+		vms = vendingMachine.addCoin(vms, uk);
 		assertTrue(vms.getCoinsAccumulated().total() > 65);
 		vms= vendingMachine.selectButton(vms);
 		assertEquals("THANK YOU" , vms.getMachineDisplay().getDisplay());
@@ -94,6 +95,7 @@ public class VendingMachineTest {
 		VendingMachine vendingMachine = buildVendingMaching(2, 5);
 		Product product = Product.NO_PRODUCT_SELECTED;
 		CoinsAccumulated coinsAccumulated = new CoinsAccumulated();
+		UnknownCoin uk = new UnknownCoin(5.0d, 21.21d);
 		MeasuredCoin measuredCoin = new MeasuredCoin(5);
 		coinsAccumulated = coinsAccumulated.addCoin(measuredCoin);
 		VendingButton vendingButton = new VendingButton(VendingAction.VEND, product);
@@ -101,7 +103,7 @@ public class VendingMachineTest {
 		vms= vendingMachine.selectButton(vms);
 		assertEquals("$0.05" , vms.getMachineDisplay().getDisplay());
 
-		vms = vendingMachine.addCoin(vms, measuredCoin);
+		vms = vendingMachine.addCoin(vms, uk);
 		vms= vendingMachine.selectButton(vms);
 		assertEquals("$0.10" , vms.getMachineDisplay().getDisplay());
 

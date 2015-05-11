@@ -87,9 +87,19 @@ public class VendingMachine {
 		return newMachineStatus;
 	}
 
-	public VendingMachineStatus addCoin(VendingMachineStatus vendingMachineStatus, MeasuredCoin coin) {
-		CoinsAccumulated allCoins = vendingMachineStatus.getCoinsAccumulated().addCoin(coin);
-		return new VendingMachineStatus(allCoins, vendingMachineStatus.getMachineDisplay(), vendingMachineStatus.getVendingButton());
+	public VendingMachineStatus addCoin(VendingMachineStatus vendingMachineStatus, UnknownCoin coin) {
+		MeasuredCoin idCoin = coinWeights.measureCoin(coin);
+		VendingMachineStatus vms;
+		if (CoinWeights.NOT_RECOGNIZED != idCoin) {
+			CoinsAccumulated allCoins = vendingMachineStatus.getCoinsAccumulated().addCoin(idCoin);
+			vms = new VendingMachineStatus(allCoins, vendingMachineStatus.getMachineDisplay(), vendingMachineStatus.getVendingButton());
+		} else {
+			MachineDisplay machineDisplay = new MachineDisplay("INSERT COINS");
+			CoinsAccumulated returnedCoins = new CoinsAccumulated();
+			returnedCoins.addCoin(idCoin);
+			vms = new VendingMachineStatus(vendingMachineStatus.getCoinsAccumulated(), machineDisplay, returnedCoins);
+		}
+		return vms;
 	}
 
 	public CoinDisplay getCoinDisplay(VendingMachineStatus vendingMachineStatus) {

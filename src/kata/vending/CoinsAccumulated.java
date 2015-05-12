@@ -34,7 +34,7 @@ public class CoinsAccumulated {
 		return new CoinsAccumulated(newCoinList);
 	}
 
-	List<MeasuredCoin> getRawCoins() {
+	public List<MeasuredCoin> getRawCoins() {
 		final List<MeasuredCoin> newCoinList = new ArrayList<>(coins.size() );
 		newCoinList.addAll(coins);
 		return newCoinList;

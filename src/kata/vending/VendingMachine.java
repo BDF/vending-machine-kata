@@ -113,7 +113,6 @@ public class VendingMachine {
 		return new VendingMachineStatus(new CoinsAccumulated(), new MachineDisplay("INSERT COIN"), coinsReturned);
 	}
 
-
 	public VendingMachineStatus selectButton(VendingMachineStatus vendingMachineStatus) {
 		VendingAction vendingAction = vendingMachineStatus.getVendingButton().getVendingAction();
 		VendingMachineStatus newVmsState;

@@ -4,10 +4,8 @@
                            MachineDisplay MeasuredCoin Product ProductSelection ProductStatus UnknownCoin
                            VendingAction VendingButton VendingMachine VendingMachineStatus)))
 
-
 (def machineFactory (CoinWeightFactory.))
 (def coinIdMachine (.buildUsCoinSystem machineFactory))
-(def status (VendingMachineStatus.))
 
 ;; Should just have one set of configuration; instead of one for clojure and one for java.
 ;; but part of this is to play with the java interop...
@@ -45,11 +43,65 @@
 (defn addCoin [vms unkCoin]
       (.addCoin vendingMachine vms unkCoin))
 
+(defn addQuarter [vms]
+      (addCoin vms uQuarter))
+
+(defn addDime [vms]
+      (addCoin vms uDime))
+
+(defn addNickle [vms ]
+      (addCoin vms uNickle))
+
+(defn selectProductButton [vms product]
+      (let [vb (VendingButton. VendingAction/VEND product)]
+           (VendingMachineStatus. (.getCoinsAccumulated vms)
+                                 (.getMachineDisplay vms)
+                                 vb)))
+
+(defn returnCoins [vms]
+      (let [vb (VendingButton. VendingAction/COIN_RETURN Product/NO_PRODUCT_SELECTED)]
+           (VendingMachineStatus. (.getCoinsAccumulated vms)
+                                 (.getMachineDisplay vms)
+                                 vb))
+      (.selectButton vendingMachine vms))
+
+(defn vendProduct [vms product]
+      (.selectButton vendingMachine (selectProductButton vms product)))
+
 (defn coinDisplay [vms]
       (.getCoinDisplay vendingMachine vms))
 
-(defn vendProduct [vms]
-      (.selectProduct vms))
+
+(defn takeAction[action vms]
+      (case action
+            "q" (addQuarter vms)
+            "d" (addDime vms)
+            "n" (addNickle vms)
+            "c" (vendProduct vms cola)
+            "h" (vendProduct vms chips)
+            "a" (vendProduct vms candy)
+            "r" (returnCoins vms)
+            "e" nil))
+
+
+(defn runMachine []
+  (println (str ";; q -> addQuarter
+;; n -> addNickle
+;; d -> addDime
+;; c -> vend cola
+;; h -> vend chips
+;; a -> vend candy
+;; e -> quit
+;; r -> return coins"))
+  (let [vms (atom (VendingMachineStatus.))]
+       (while (not (nil? @vms)))
+        (let [action (read-line)]
+             (println  (str "aciton? :"))
+             (reset! vms (takeAction vms action))
+             (print (-> (.getCoinDisplay vendingMachine) (.getCoinDisplay)) ))
+
+       )
+  )
 
 
 

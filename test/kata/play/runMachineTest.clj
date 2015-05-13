@@ -23,6 +23,9 @@
               )
          )
 
+(testing "Adding money accumulates in the coin accumaltor"
+         )
+
 
 ;(require '[clojure.test :refer [run-tests]])
 ;(require 'kata.play.runMachineTest :reload-all)

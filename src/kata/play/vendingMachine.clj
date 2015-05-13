@@ -28,9 +28,9 @@
                             (.put quarter 5)))
 
 (def initialProductCount (doto (new java.util.HashMap)
-                            (.put cola 5)
-                            (.put chips 5)
-                            (.put candy 5)))
+                               (.put cola 5)
+                               (.put chips 5)
+                               (.put candy 5)))
 
 (def vms (VendingMachineStatus.))
 (def coinExchanger (CoinExchanger. initialCoinCount))
@@ -49,20 +49,20 @@
 (defn addDime [vms]
       (addCoin vms uDime))
 
-(defn addNickle [vms ]
+(defn addNickle [vms]
       (addCoin vms uNickle))
 
 (defn selectProductButton [vms product]
       (let [vb (VendingButton. VendingAction/VEND product)]
            (VendingMachineStatus. (.getCoinsAccumulated vms)
-                                 (.getMachineDisplay vms)
-                                 vb)))
+                                  (.getMachineDisplay vms)
+                                  vb)))
 
 (defn returnCoins [vms]
       (let [vb (VendingButton. VendingAction/COIN_RETURN Product/NO_PRODUCT_SELECTED)]
            (VendingMachineStatus. (.getCoinsAccumulated vms)
-                                 (.getMachineDisplay vms)
-                                 vb))
+                                  (.getMachineDisplay vms)
+                                  vb))
       (.selectButton vendingMachine vms))
 
 (defn vendProduct [vms product]
@@ -72,7 +72,7 @@
       (.getCoinDisplay vendingMachine vms))
 
 
-(defn takeAction[action vms]
+(defn takeAction [vms action]
       (case action
             "q" (addQuarter vms)
             "d" (addDime vms)
@@ -85,24 +85,26 @@
 
 
 (defn runMachine []
-  (println (str ";; q -> addQuarter
+      (def helpStr ";; q -> addQuarter
 ;; n -> addNickle
 ;; d -> addDime
 ;; c -> vend cola
 ;; h -> vend chips
 ;; a -> vend candy
 ;; e -> quit
-;; r -> return coins"))
-  (let [vms (atom (VendingMachineStatus.))]
-       (while (not (nil? @vms)))
-        (let [action (read-line)]
-             (println  (str "aciton? :"))
-             (reset! vms (takeAction vms action))
-             (print (-> (.getCoinDisplay vendingMachine) (.getCoinDisplay)) ))
+;; r -> return coins
+;; ? -> this help")
+      (println helpStr)
+      (let [vms (atom (VendingMachineStatus.))]
+           (while (not (nil? @vms))
+                  (let [action (do (print "Action? ") (flush) (read-line))]
+                       (reset! vms (takeAction @vms action))
+                       (println (-> (.getMachineDisplay @vms) (.getDisplay)))
+                       )
+                  )
 
-       )
-  )
-
+           )
+      )
 
 
 
